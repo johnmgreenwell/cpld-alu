@@ -1,0 +1,18 @@
+# ignore all logs
+*.log
+
+# Ignore miscellaneous files in this directory
+assets/local
+src/.pio
+src/.vscode
+src/include/README
+src/lib
+src/test
+src/cpld/*.qpf
+src/cpld/*.qsf
+src/cpld/*.qws
+src/cpld/*.rpt
+src/cpld/db
+src/cpld/incremental_db
+src/cpld/output_files
+src/cpld/simulation

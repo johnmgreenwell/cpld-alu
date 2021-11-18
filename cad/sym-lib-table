@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name teensy)(type Legacy)(uri ${KIPRJMOD}/components/teensy.lib)(options "")(descr ""))
+  (lib (name ili9340_tft)(type Legacy)(uri ${KIPRJMOD}/components/ili9340_tft.lib)(options "")(descr ""))
+)
