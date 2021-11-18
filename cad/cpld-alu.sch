@@ -176,11 +176,11 @@ Wire Wire Line
 Wire Wire Line
 	5400 4550 5150 4550
 Text Label 5150 4550 0    50   ~ 0
-SCK
+SCL
 Wire Wire Line
 	5400 4650 5150 4650
 Text Label 5150 4650 0    50   ~ 0
-MOSI
+SDA
 NoConn ~ 5400 4850
 $Comp
 L power:GND #PWR05

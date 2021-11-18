@@ -299,7 +299,7 @@ Entry Wire Line
 Entry Wire Line
 	6800 3500 6900 3400
 Entry Wire Line
-	7000 3500 7100 3400
+	7250 3500 7350 3400
 Entry Wire Line
 	7400 3500 7500 3400
 Entry Wire Line
@@ -315,8 +315,6 @@ Wire Wire Line
 Wire Wire Line
 	6900 3150 6900 3400
 Wire Wire Line
-	7100 3150 7100 3400
-Wire Wire Line
 	7500 3150 7500 3400
 Wire Wire Line
 	7700 3150 7700 3400
@@ -330,7 +328,7 @@ Text Label 6700 3400 0    50   ~ 0
 F2
 Text Label 6900 3400 0    50   ~ 0
 F3
-Text Label 7100 3400 0    50   ~ 0
+Text Label 7350 3400 0    50   ~ 0
 F4
 Text Label 7500 3400 0    50   ~ 0
 F5
@@ -828,6 +826,11 @@ Wire Wire Line
 	1800 6450 1650 6450
 Wire Wire Line
 	1650 6450 1650 6350
+Connection ~ 1650 6350
+Wire Wire Line
+	7400 3400 7350 3400
+Wire Wire Line
+	7400 3150 7400 3400
 Wire Bus Line
 	2150 3500 7800 3500
 Wire Bus Line
@@ -840,5 +843,4 @@ Wire Bus Line
 	8700 3800 8700 5050
 Wire Bus Line
 	5150 750  9000 750 
-Connection ~ 1650 6350
 $EndSCHEMATC
