@@ -3,7 +3,7 @@
 // Purpose     : Virtual Port Class
 // Description : 
 //               This class intended for arbitrary grouping of IO pins as
-//               8-bit port objects. Also supports grouping of IO pins using
+//               8-bit port objects, and also grouping of IO pins using
 //               less than 8 bits.
 //
 //               Expansion of this class might include operator overloads

@@ -16,63 +16,38 @@
 namespace PeripheralIO {
 
 MCP23X08::MCP23X08()
-: _IOBegin(nullptr),
-  _mcpWrite(nullptr),
-  _mcpRead(nullptr),
-  _userMcpWrite(nullptr),
-  _userMcpRead(nullptr),
+: _wire(nullptr),
+  _spi(nullptr),
   _address(0),
   _cs(0)
 { }
 
 /*!
-    @brief Initialize MCP23X08 default (hardware I2C)
-*/
-void MCP23X08::begin() {
-    begin(MCP23X08_ADDR);
-}
-
-/*!
-    @brief Initialize MCP23X08 using hardware I2C
+    @brief Initialize MCP23X08 using I2C
     @param address 3 LSB matching device external biasing
+    @param wire I2C object connected to the device
 */
-void MCP23X08::begin(uint8_t address) {
+void MCP23X08::begin(uint8_t address, TwoWire& wire) {
     _address = MCP23X08_ADDR | (address & 0x07);
+    _wire = &wire;
     _mcpWrite = &PeripheralIO::MCP23X08::i2cWrite;
     _mcpRead = &PeripheralIO::MCP23X08::i2cRead;
-    Wire.begin();
 }
 
 /*!
     @brief Initialize MCP23X08 using hardware SPI
-    @param address 3 LSB matching device external biasing
+    @param address 2 LSB matching device external biasing
     @param cs_pin CS pin number
+    @param spi SPI object connected to the device
 */
-void MCP23X08::begin(uint8_t address, uint8_t cs_pin) {
+void MCP23X08::begin(uint8_t address, uint8_t cs_pin, SPIClass& spi) {
     _address = (MCP23X08_ADDR << 1) | ((address & 0x03) << 1);
     _cs = cs_pin;
-    ::pinMode(_cs, OUTPUT);
-    ::digitalWrite(_cs, HIGH);
+    _spi = &spi;
     _mcpWrite = &PeripheralIO::MCP23X08::spiWrite;
     _mcpRead = &PeripheralIO::MCP23X08::spiRead;
-    SPI.begin();
-}
-
-/*!
-    @brief Initialize MCP23X08 using user custom functions
-    @param address Full 8-bit address, LSB ignored (R/W bit)
-    @param mcpIOBegin_ptr Custom IO begin function pointer
-    @param mcpWrite_ptr Custom IO write function pointer
-    @param mcpRead_ptr Custom IO read function pointer
-*/
-void MCP23X08::begin(uint8_t address, void (*mcpIOBegin_ptr)(void), 
-        void (*mcpWrite_ptr)(uint8_t, uint8_t), uint8_t (*mcpRead_ptr)(uint8_t)) {
-    _address = address;
-    _userMcpWrite = mcpWrite_ptr;
-    _userMcpRead = mcpRead_ptr;
-    _mcpWrite = &PeripheralIO::MCP23X08::userWrite;
-    _mcpRead = &PeripheralIO::MCP23X08::userRead;
-    mcpIOBegin_ptr();
+    ::pinMode(_cs, OUTPUT);
+    ::digitalWrite(_cs, HIGH);
 }
 
 /*!
@@ -118,7 +93,7 @@ void MCP23X08::portMode(uint8_t mode) const {
     @brief Set value for specific pin
     @param pin Pin to set
     @param val Logic level (i.e. HIGH, LOW)
-    @result Boolean true for complettion, false for bad input
+    @result Boolean true for completion, false for bad input
 */
 bool MCP23X08::digitalWrite(uint8_t pin, uint8_t val) const {
     uint8_t data = 0;
@@ -176,9 +151,9 @@ uint8_t MCP23X08::read(uint8_t reg) const {
 // Private: Hardware SPI Write Function
 void MCP23X08::spiWrite(uint8_t reg, uint8_t byte) const {
     ::digitalWrite(_cs, LOW);
-    SPI.transfer(_address);
-    SPI.transfer(reg);
-    SPI.transfer(byte);
+    _spi->transfer(_address);
+    _spi->transfer(reg);
+    _spi->transfer(byte);
     ::digitalWrite(_cs, HIGH);
 }
 
@@ -186,41 +161,31 @@ void MCP23X08::spiWrite(uint8_t reg, uint8_t byte) const {
 uint8_t MCP23X08::spiRead(uint8_t reg) const {
     uint8_t data = 0;
     ::digitalWrite(_cs, LOW);
-    SPI.transfer(_address | 0x01);
-    SPI.transfer(reg);
-    data = SPI.transfer(0);
+    _spi->transfer(_address | 0x01);
+    _spi->transfer(reg);
+    data = _spi->transfer(0);
     ::digitalWrite(_cs, HIGH);
     return data;
 }
 
 // Private: Hardware I2C Write Function
 void MCP23X08::i2cWrite(uint8_t reg, uint8_t byte) const {
-    Wire.beginTransmission(_address);
-    Wire.write(reg);
-    Wire.write(byte);
-    Wire.endTransmission();
+    _wire->beginTransmission(_address);
+    _wire->write(reg);
+    _wire->write(byte);
+    _wire->endTransmission();
 }
 
 // Private: Hardware I2C Read Function
 uint8_t MCP23X08::i2cRead(uint8_t reg) const {
     uint8_t data = 0;
-    Wire.beginTransmission(_address);
-    Wire.write(reg);
-    Wire.endTransmission(0);
-    Wire.requestFrom(_address, (uint8_t)1);
-    if (Wire.available()) data = Wire.read();
-    Wire.endTransmission();
+    _wire->beginTransmission(_address);
+    _wire->write(reg);
+    _wire->endTransmission(0);
+    _wire->requestFrom(_address, (uint8_t)1);
+    if (_wire->available()) data = Wire.read();
+    _wire->endTransmission();
     return data;
-}
-
-// Private: User Custom Write Wrapper Method
-void MCP23X08::userWrite(uint8_t reg, uint8_t byte) const {
-    _userMcpWrite(reg, byte);
-}
-
-// Private: User Custom Read Wrapper Method
-uint8_t MCP23X08::userRead(uint8_t reg) const {
-    return _userMcpRead(reg);
 }
 
 // Base Address and Register Defines

@@ -26,37 +26,15 @@ class MCP23X08 {
 public:
     MCP23X08();
 
-    void begin();
-    // Initilize IO to the MCP23X08 with default mode I2C (hardware)
-    // Assumes address bits A2-A0 are all externally biased low 
-
-    void begin(uint8_t address);
-    // Initialize IO to the MCP23X08 with mode I2C (hardware)
+    void begin(uint8_t address=0, TwoWire& wire=Wire);
+    // Initialize IO to the MCP23X08 with mode I2C (Wire)
     // Input address is only the 3 LSB matching device external biasing
+    // Wire must be initialized beforehand
 
-    void begin(uint8_t address, uint8_t cs_pin);
+    void begin(uint8_t address, uint8_t cs_pin, SPIClass& spi=SPI);
     // Initialize IO to the MCP23X08 with mode SPI (hardware)
-    // Input address is only the 3 LSB matching device external biasing
-    // Value of cs_pin is pin number connected to CS pin on the device
-
-    void begin(uint8_t address,
-               void (*mcpIOBegin_ptr)(void), 
-               void (*mcpWrite_ptr)(uint8_t, uint8_t),
-               uint8_t (*mcpRead_ptr)(uint8_t));
-    // Advanced: Initilize custom IO to the MCP23X08
-    // Custom IO allows arbitrary software SPI or I2C via pointers
-    // Format must strictly match the following and accomplish description
-    //
-    // address: 8-bit, MSB of addr at MSB of byte (LSB for internal R/W bit)
-    //
-    // void mcpIOBegin_ptr();
-    // All necessary IO setup required for subsequent functions
-    //
-    // void mcpWrite_ptr(uint8_t reg, uint8_t val);
-    // Write value val to register reg (ref datasheet for details)
-    //
-    // uint8_t mcpRead_ptr(uint8_t reg);
-    // Return value from register reg (ref datasheet for details)
+    // Input address is only the 2 LSB matching device external biasing
+    // Wire must be initialized beforehand
 
     bool pinMode(uint8_t pin, uint8_t mode) const;
     // Set input/output mode on individual pin 0-7
@@ -93,19 +71,16 @@ public:
  
 private:
 
-    void (PeripheralIO::MCP23X08::*_IOBegin)(void) const;
     void (PeripheralIO::MCP23X08::*_mcpWrite)(uint8_t reg, uint8_t byte) const;
     uint8_t (PeripheralIO::MCP23X08::*_mcpRead)(uint8_t reg) const;
-    void (*_userMcpWrite)(uint8_t reg, uint8_t byte);
-    uint8_t (*_userMcpRead)(uint8_t reg);
 
     void spiWrite(uint8_t reg, uint8_t byte) const;
     uint8_t spiRead(uint8_t reg) const;
     void i2cWrite(uint8_t reg, uint8_t byte) const;
     uint8_t i2cRead(uint8_t reg) const;
-    void userWrite(uint8_t reg, uint8_t byte) const;
-    uint8_t userRead(uint8_t reg) const;
 
+    TwoWire *_wire;
+    SPIClass *_spi;
     uint8_t _address;
     uint8_t _cs;
 };

@@ -75,7 +75,7 @@ bool VirtualPort::digitalWrite(uint8_t pin, uint8_t val) const {
     @result Value read
 */
 uint8_t VirtualPort::digitalRead(uint8_t pin) const {
-    if (pin > _n_bits) return 0;
+    if (pin > _n_bits) return -1;
     return ::digitalRead(_pins[pin]);
 }
 
